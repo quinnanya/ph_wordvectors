@@ -53,13 +53,13 @@ This tutorial is written with Python usage in mind, though most of the wide conc
 
 ## Introduction
 
-When are the astronomical associations for “revolution” supplanted by political ones? How do popular methods for cooking chicken change over time? How do the associations of words like “grace” or “love” change between prayers and romantic novels? Questions such as these are the type of humanistic inquiries that can be prove to be challenging to answer through traditional methods. However, due to their ability to quickly learn what the relationships are between words, we can begin to answer these questions using word embeddings. Word embeddings assign a set of numeric values to words in a corpus based on their contexts of use. Those sets of numeric values, or word vectors, allow us to measure the distance between words, which gives us a proxy for how words are used in similar ways or contexts. Scaled up to a whole corpus, word embeddings give us a view into the relationships between words or concepts from a time period, genre of writing, author, and so on. 
+When are the astronomical associations for “revolution” supplanted by political ones? How do popular methods for cooking chicken change over time? How do the associations of words like “grace” or “love” change between prayers and romantic novels? Questions such as these are the type of humanistic inquiries that can be prove to be challenging to answer through traditional methods such as close reading. However, due to their ability to quickly learn what the relationships are between words, we can begin to answer these questions using word embeddings. Word embeddings assign a set of numeric values to words in a corpus based on their contexts of use. Those sets of numeric values, or word vectors, allow us to measure the distance between words, which gives us a proxy for how words are used in similar ways or contexts. Scaled up to a whole corpus, word embeddings give us a view into the relationships between words or concepts from a time period, genre of writing, author, and so on. 
 
 Unlike topic models, which rely on word usage to better understand *documents*, word embeddings are more concerned with how words across a whole a corpus are used. This emphasis on relationships and contextual usage make word embeddings uniquely equipped to tackle many questions that humanists may have about a particular corpus of texts. For example, with a word embedding model, you can ask your model to identify the list of top ten words that are semantically similar to the word “grace.” You can also ask your model to produce that same list, but this time remove the concept of “holy” from consideration. You can even ask your model to show you what the most similar words are in your corpus to the concept of “grace” and “holy” combined. The ability to perform basic math with concepts (though much more complicated math is happening under the hood) in order to ask really complicated questions of a corpus is one of the key benefits of using word embeddings for text analysis. 
 
 Word embeddings require *a lot* of text in order to do a reasonable job representing these relationships—you won’t get meaningful output if you use a couple of novels or a handful of historical documents. This is because of how the algorithm works—it makes predictions about the contexts in which words will appear based on how they are used in the corpus you use to train the model, so fewer words in the training corpus means that there will be less information for the model to learn from. That said, there is no absolute minimum number of words required to train a word embedding model; performance will vary depending on how the model is trained, what kinds of documents you are using, how many unique words appear in the corpus, and so on. If your purposes are exploratory, even a model trained on a fairly small corpus should still produce interesting results—and if you find that the model doesn't seem to make sense, that might mean you need to add more texts to your input corpus or adjust your settings for training the model. 
 
-This lesson is designed to get you started with word embedding models: you will learn how to prepare your corpus, read it into your Python session, train a model, and perform some exploratory queries. There are many other potential research applications for trained models—for example, [this tutorial](https://github.com/programminghistorian/ph-submissions/blob/gh-pages/en/drafts/originals/clustering-visualizing-word-embeddings.md) explains how to cluster and visualize documents using word embedding models. The Women Writers Project has also published a [series of tutorials in R and Python](https://github.com/NEU-DSG/wwp-public-code-share/tree/main/WordVectors) that cover the basics of running code, training and querying models, validating trained models, and producing exploratory visualizations.  
+This lesson is designed to get you started with word embedding models: you will learn how to prepare your corpus, read it into your Python session, train a model, and perform some exploratory queries. There are many other potential research applications for trained models—for example, [this tutorial](https://github.com/programminghistorian/ph-submissions/blob/gh-pages/en/drafts/originals/clustering-visualizing-word-embeddings.md) explains how to cluster and visualize documents using word embedding models. The Women Writers Project has also published a [series of tutorials in R and Python](https://github.com/NEU-DSG/wwp-public-code-share/tree/main/WordVectors) that cover the basics of running code, training and querying models, validating trained models, and producing exploratory visualizations. This lesson focuses primarily on the theory behind word vectors—how to interpret them, how to prepare a corpus for training a model, and how word vectors work. The lesson will provide some introductory code to get you started with word vectors, but the code is slightly more minimal in comparison to developing core concepts and understanding of the functionality and methodology of word vectors.
 
 ### Data
 
@@ -73,7 +73,7 @@ While word embeddings have been implemented in many different ways using varying
 
 The way that word embedding models represent words is through a series of numbers referred to as a *word vector*. A word vector represents the positioning of a word in some multi-dimensional space. Just like we could perform basic math on objects that we’ve mapped onto two-dimensional space (e.g. visualizations with an X and Y axis), we can perform slightly more complicated math on words mapped into multi-dimensional space.
 
-A "vector" is not simply a point in space, like we find in two-dimensional visualizations, but a point in space that has both *magnitude* and *direction*. This means that vectors are less like isolated points and more lines that trace a path from some origin point to that vector's designated position in what is called *vector space*. Models created using word vectors, called *word embedding models*, use word vectors to capture the relationships between words based on how close words are to one another in that vector space. 
+A "vector" is not simply a point in space, like we find in two-dimensional graphs, but a point in space that has both *magnitude* and *direction*. This means that vectors are less like isolated points and more lines that trace a path from some origin point to that vector's designated position in what is called *vector space*. Models created using word vectors, called *word embedding models*, use word vectors to capture the relationships between words based on how close words are to one another in that vector space. 
 
 This may sound complicated and abstract, but let’s start with a kind of word vector that is more straightforward: a document-term matrix.
 
@@ -103,8 +103,6 @@ Word2vec collects a sample of contexts around each word, throughout the corpus, 
 It then takes this data and uses it to train a neural network that can predict the words that are likely, and those that are unlikely, to appear around the word “milk”. A neural network consists of a set of weights that are constantly adjusted as the network is trained, in order to make the network more accurate in its predictions. At the end of training, the values of those weights become the dimensions of the word vectors in the embedding model.
 
 Because of how it samples the text and trains the model, word2vec works well for identifying synonyms, and things that could be substituted in a particular context. Using this method, “juice” will probably end up being closer to “milk” than “cow”, because it’s more feasible to substitute “juice” than “cow” in a phrase like “Pour the \[word\] into the”.
-
-Because word2vec samples skipgrams, you won’t end up with the same result every time. It may be worthwhile to run a word2vec model a few times to make sure you don’t get dramatically different results for the things you’re interested in as a result of different sampling. Especially if you’re looking to make a fine point of semantic shift over time, you need to take care to minimize random variation, for instance, by keeping random seeds the same and using the same skip-gram window.
 
 
 ### Understanding distance in vector space
@@ -286,6 +284,8 @@ Like workers, the epoch parameter is optional. Basically, the number of epochs c
 **Sg** ("skip-gram")
 The sg parameter tells the computer what training algorithm to use. The options are CBOW (continuous bag of words) or skip-gram. In order to select CBOW, you set sg to the value 0 and in order to select skip-gram, you set the sg value to 1. The best choice of training algorithm really depends on what your data looks like.
 
+Because word2vec samples skipgrams, you won’t end up with the same result every time. It may be worthwhile to run a word2vec model a few times to make sure you don’t get dramatically different results for the things you’re interested in as a result of different sampling. Especially if you’re looking to make a fine point of semantic shift over time, you need to take care to minimize random variation, for instance, by keeping random seeds the same and using the same skip-gram window.
+
 The code below will actually train the model, using some of the parameters discussed above: 
 
 ```
@@ -372,7 +372,7 @@ There are other methods for conducting a model evaluation. For example, a popula
 
 ```
 
-dirpath = Path(r"../../WordVectors/python/").glob('*.model') #current directory plus only files that end in 'model' 
+dirpath = Path(r"'FILL IN YOUR FILE PATH HERE’").glob('*.model') #current directory plus only files that end in 'model' 
 files = dirpath
 model_list = [] # a list to hold the actual models
 model_filenames = []  # the filepath for the models so we know where they came from
@@ -392,7 +392,7 @@ for filename in files:
 # test word pairs that we are going to use to evaluate the models
 test_words = [("stir", "whisk"),
              ("cream", "milk"),
-             ("cake", "cupcake"),
+             ("cake", "muffin"),
              ("jam", "jelly"),
              ("reserve", "save"),
              ("bake", "cook")]
@@ -417,11 +417,21 @@ for i in range(len(model_list)):
         
         # add the temporary dataframe to our final dataframe
         evaluation_results.loc[x] = df
-
+        
 # save the evaluation_results dataframe as a .csv called "word2vec_model_evaluation.csv" in our current directory
 # if you want the .csv saved somewhere specific, include the filepath in the .to_csv() call
 evaluation_results.to_csv('word2vec_model_evaluation.csv')
 ```
+
+The resulting .csv file contains a list of the models that were tested, the word pairs tested, and the cosine similarity for each word pair in that particular model. We've saved this file as a .csv for future reference, but you can also view the results inline by running the code below:
+
+```
+print(evaluation_results)
+
+```
+
+The point of evaluating a set of models using this method, is that by choosing word pairings which should have very high cosine similarities (i.e. words that are closely related) or even pairings that should have very low cosine similarity, then you can get a sense of how well your model is performing. By evaluating a group of models, you can test which model out of the group you've trained with different parameters most successfully works with the words in your vocabulary.
+
 
 ## Corpus considerations
 
