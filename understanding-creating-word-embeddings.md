@@ -142,9 +142,9 @@ The first step in building the model is to identify the files you will be using 
 
 ### Preparing your corpus
 
-```
+We're going to start by importing all of the libraries that we will need for this lesson as below. It is a good practice in programming to keep your import statements together at the top of your code. The code block below imports each library and provides a comment explaining that the purpose of that library is.
 
-# A good practice in programming is to place your import statements at the top of your code, and to keep them together
+```
 
 import re                                   # for regular expressions
 import os                                   # to look up operating system-based info
@@ -167,7 +167,7 @@ A few important things to note:
 
 3. You can use a file path to a folder full of different types of files, but this code is only going to look for *.txt files*. If you want to work with different file types, you'll have to change the "endswith(.txt)" call. However, keep in mind that these files should always contain some form of plain text. For example, a Word document or a PDF won't work with this code.
 
-In the code block below, you will provide the file path for the sample corpus which you should have downloaded and saved somewhere easy for you to locate. The sample corpus can be downloaded from [Github](https://github.com/ViralTexts/nineteenth-century-recipes).
+In the code block below, you will provide the file path for the sample corpus which you should have downloaded and saved somewhere easy for you to locate. The sample corpus can be downloaded from [Github](https://github.com/ViralTexts/nineteenth-century-recipes). The code will loop through the folders and sub-folders in the filepath that you provide and will look for files that are of type `.txt`. The code begins by first identifying those files and then reading them into memory.
 
 ```
 
@@ -201,6 +201,8 @@ When we use textual data to train a model, the model builds what is called a "vo
 It might seem that more regularization is always better, but that’s not necessarily the case. Decisions about regularization should take into account how spelling variations are operating in the input corpus, and should consider where original spellings and word usages might have implications for the interpretations that can be drawn from models trained on a corpus. For example, a collection might contain deliberate archaisms that are connected with poetic voice, which would be flattened in the regularized text. Nevertheless, regularization is worth considering, particularly for projects invested in exploring language usage over time: it might not be important whether the spelling is queen, quean, or queene, for a project studying discourse around queenship within a broad chronological frame. Some researchers, for example Cordell (2017) and Rawson and Muñoz (2019) advocate for more embracing of noise, emphasizing that textual noise can also be useful for some research. For this reason, "the cleaner the better" isn't necessarily the best approach depending on the types of questions you are asking of your data.
 
 Regardless of how a project approaches more extensive regularizations, it is generally useful to lowercase all of the words in the input corpus and remove most punctuation. Projects can also make decisions about how to handle cases such as contractions, which might be treated as either one word or two, as well as commonly occurring word-pairings, such as olive oil, which can be tokenized so that the model will treat them as a single item. The code we include in this tutorial for cleaning text is a reasonable general-purpose starting point for cleaning English-language texts.
+
+In the code below, the function `clean_text()` uses regular expressions to "clean" our textual data. All this means is that the code is standardizing the format of the text (lower-casing, for example) and removing punctuation that may get in the way of the model's textual understanding. This process helps the model understand, for example, that "apple" and "Apple" are the same word. We also remove numbers from our textual data since we're only interested in words here. We end the function by checking that our cleaned data hasn't had any words removed that we actually need. We do this by making sure that the set of un-cleaned text data is the same length as the cleaned version.
 
 ```
 
@@ -302,6 +304,8 @@ model.save("word2vec.model")
 
 Word2Vec has a number of built-in functions that are quite powerful. These functions allow us to ask the model questions about how it understands the text that we have provided it.
 
+In the code below, we're going to begin by just checking that the word we're interested in is in the vocabulary of our model. This is a good first step because it makes sure that the model actually contains the words we expect it to.
+
 ```
 
 # start by choosing a word and just checking if it's in your vocabulary to make sure the model works as expected
@@ -369,6 +373,8 @@ Now that we have a working model and have explored some of its functionality, it
 Validation of word vector models is currently an unsolved problem—especially for humanities research applications and models trained on historical corpora. The test below provides a sample of one approach to testing a model: seeing how it performs with word pairs that are likely to have high cosine similarities. These word pairs will be very specific to the corpus being tested, and you would want to use many more pairs than are in this demonstration sample! This is meant to be an example of the kinds of testing that are used in model evaluation, and is not a substitute for more rigorous testing processes. 
 
 There are other methods for conducting a model evaluation. For example, a popular method for evaluating a Word2Vec model is using the built in evaluate_word_analogies() function to evaluate syntactic analogies. You can also evaluate word pairs using the built in function evaluate_word_pairs() which comes with a default dataset of word pairs. You can read more about evaluating a model on Gensim's documentation [website](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html#evaluating).
+
+The code below evaluates the model by first opening the folder of models you provide it with and identifying all files that are of type `.model`. Then, the code takes a list of test word pairs and calculates their cosine similarities. The word pairs are words that, as a human, you would expect to have pretty high cosine similarities. Then, the code saves the cosine similarities for each word pair in each model in a `.csv` file for future reference. This style of evaluation can help you identify which of the models is performing best by identifying which models understand word similarities the way you would expect them to. Ultimately, this evaluation process can help you decide which training parameters or corpus sizes are ideal for your purposes.
 
 ```
 
