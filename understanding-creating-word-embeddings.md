@@ -85,7 +85,7 @@ The innovation of the common algorithms used to create embedding models  – suc
 
 ### Word2vec
 
-Word2vec was the first algorithm for creating word embedding models, and it remains one of the most popular. It is a predictive model, meaning that it works out the likelihood that a word would occur in a particular context (using the continuous bag of words, or CBOW, method), or the likelihood that a particular context would occur for a given word (with the skip-gram method). For this introduction, you don’t need to worry about the differences between these methods, but if you would like to learn more about how word embedding models are trained, there are many useful resources online, such as the [“Illustrated Word2vec”](https://jalammar.github.io/illustrated-word2vec/) guide by Jay Alammar. 
+Word2vec was the first algorithm for creating word embedding models, and it remains one of the most popular. It is a predictive model, meaning that it works out the likelihood that a word would occur in a particular context (using the continuous bag of words, or CBOW, method), or the likelihood that a particular context would occur for a given word (with the skip-gram method). For this introduction, you don’t need to worry about the differences between these methods, but if you would like to learn more about how word embedding models are trained, there are many useful resources online, such as the [“Illustrated Word2vec”](https://jalammar.github.io/illustrated-word2vec/) guide by Jay Alammar. They tend to perform very similarly, but, generally speaking, skip-gram often works better with smaller datasets and has better success representing less common words; by contrast, CBOW tends to perform better at representing more common words.
 
 For instance, take this set of sentences with the word “milk” in the middle:
 
@@ -163,9 +163,7 @@ A few important things to note:
 
 1. When you are inputting your file path, you should use the *entire* file path. For example, on a Windows computer, that file path might look something like: C:/users/admin/Documents/MY_FOLDER. On a Mac, the file path might be: /Users/admin/Documents/MY_FOLDER.
 
-2. You can use *tab completion* to fill in your file paths. Within the quotation marks (don't delete these!), hit the tab key and it will bring up the folders and files at your specific location. You can enter ../ to go up a directory. Each time you enter ../ it will go up one folder level in your computer, and you can then use tab to check where you are. Once you get *up* to, say, your "Documents" folder, you can then use tab to go *down* into the folder with your files. Even if you are not used to filling in file paths, you can use this combination of tab and ../ to navigate to the folder with the files that you want to use.
-
-3. You can use a file path to a folder full of different types of files, but this code is only going to look for *.txt files*. If you want to work with different file types, you'll have to change the "endswith(.txt)" call. However, keep in mind that these files should always contain some form of plain text. For example, a Word document or a PDF won't work with this code.
+2. You can use a file path to a folder full of different types of files, but this code is only going to look for *.txt files*. If you want to work with different file types, you'll have to change the "endswith(.txt)" call. However, keep in mind that these files should always contain some form of plain text. For example, a Word document or a PDF won't work with this code.
 
 In the code block below, you will provide the file path for the sample corpus which you should have downloaded and saved somewhere easy for you to locate. The sample corpus can be downloaded from [Github](https://github.com/ViralTexts/nineteenth-century-recipes). The code will loop through the folders and sub-folders in the filepath that you provide and will look for files that are of type `.txt`. The code begins by first identifying those files and then reading them into memory.
 
@@ -200,7 +198,9 @@ When we use textual data to train a model, the model builds what is called a "vo
 
 It might seem that more regularization is always better, but that’s not necessarily the case. Decisions about regularization should take into account how spelling variations are operating in the input corpus, and should consider where original spellings and word usages might have implications for the interpretations that can be drawn from models trained on a corpus. For example, a collection might contain deliberate archaisms that are connected with poetic voice, which would be flattened in the regularized text. Nevertheless, regularization is worth considering, particularly for projects invested in exploring language usage over time: it might not be important whether the spelling is queen, quean, or queene, for a project studying discourse around queenship within a broad chronological frame. Some researchers, for example Cordell (2017) and Rawson and Muñoz (2019) advocate for more embracing of noise, emphasizing that textual noise can also be useful for some research. For this reason, "the cleaner the better" isn't necessarily the best approach depending on the types of questions you are asking of your data.
 
-Regardless of how a project approaches more extensive regularizations, it is generally useful to lowercase all of the words in the input corpus and remove most punctuation. Projects can also make decisions about how to handle cases such as contractions, which might be treated as either one word or two, as well as commonly occurring word-pairings, such as olive oil, which can be tokenized so that the model will treat them as a single item. The code we include in this tutorial for cleaning text is a reasonable general-purpose starting point for cleaning English-language texts.
+Regardless of how a project approaches more extensive regularizations, it is generally useful to lowercase all of the words in the input corpus and remove most punctuation. Projects can also make decisions about how to handle cases such as contractions, which might be treated as either one word or two, as well as commonly occurring word-pairings, such as olive oil, which can be tokenized so that the model will treat them as a single item. The code we include in this tutorial for cleaning text is a reasonable general-purpose starting point for cleaning English-language texts. By default, this code will split contractions into multiple tokens and remove apostrophes (e.g., “can’t” would be tokenized as: “can” and “t”). This is something you can adjust: **Avery fill in***
+
+Different tokenization modules will have different options for handling contractions, so you can choose a package or module that will allow you to preprocess your texts with whatever forms of tokenization best matches your corpus and research needs. 
 
 In the code below, the function `clean_text()` uses regular expressions to "clean" our textual data. All this means is that the code is standardizing the format of the text (lower-casing, for example) and removing punctuation that may get in the way of the model's textual understanding. This process helps the model understand, for example, that "apple" and "Apple" are the same word. We also remove numbers from our textual data since we're only interested in words here. We end the function by checking that our cleaned data hasn't had any words removed that we actually need. We do this by making sure that the set of un-cleaned text data is the same length as the cleaned version.
 
@@ -439,7 +439,7 @@ print(evaluation_results)
 The point of evaluating a set of models using this method, is that by choosing word pairings which should have very high cosine similarities (i.e. words that are closely related) or even pairings that should have very low cosine similarity, then you can get a sense of how well your model is performing. By evaluating a group of models, you can test which model out of the group you've trained with different parameters most successfully works with the words in your vocabulary.
 
 
-## Corpus considerations
+## Building a corpus for your own research
 
 Now that you've had a chance to explore training and querying a model using a sample corpus, you might begin considering applications of word embeddings to your own research. In thinking about whether word vectors are useful for you, it's important to consider whether you are trying to investigate the kinds of questions that can be revealed by looking at patterns in word usage across a large corpus. This means considering:
 
@@ -455,7 +455,7 @@ Another important consideration for building your corpus is the composition of t
 
 Overall, you should aim toward a balance in the salient features of the texts that you select (publication date, genre, publication location, language) and a close alignment between the texts in your corpus and the aims of your research. If you are comparing corpora, try to make sure that the only difference between them is the feature that you are investigating. Remember that word vectors are going to give you information about the relationships between words in a corpus—so the actual words that go into your corpora are crucial! 
 
-## Corpus preparation
+### Preparing the texts in your corpus
 
 When you are preparing your corpus, bear in mind that the model is trained on *all* the words in your corpus—so you should make sure to only include the words that you want to form part of your analysis. This is to say, if you’re sourcing texts from Project Gutenberg, you will want to remove the project's own boilerplate at the beginning and end of the texts. However, if you’re primarily interested in the nouns in your texts, that doesn’t mean you should strip out all the other parts of speech: they provide useful contextual information when creating the word vectors.
 
@@ -464,6 +464,10 @@ Because the results depend so heavily on the input data, it’s crucial to inclu
 Some common information types that are often included with digital texts will need to be removed for most projects, as we just saw with the example of Project Gutenberg metadata. Other language to consider removing includes: editorially-authored text (such as annotations or descriptions of images), page numbers, and labels. Removing these is preferable both because they are not likely to be of interest in most cases and also because they can artificially introduce distance between closely related terms when the model is trained. 
 
 For other document features, the goals of the project will impact which would best be removed or kept. These include paratexts—such as indices, tables of contents, and advertisements—as well as features like stage directions. And finally, you may choose to manipulate the language of your documents directly, such as by regularizing or modernizing the spelling, correcting errors, or lemmatizing text. Note that if you make changes to the language of your documents, you will also want to maintain an unmodified corpus, so that you can investigate the impacts of your data manipulations. 
+
+### Training and querying a model
+
+Once you have identified a corpus and prepared your texts, you can adapt the code above to train, query, and validate your model. Remember: this is an iterative process! You will likely need to make additional changes to your data and your parameters as you better understand what your model can show about the texts in your corpus. The more you experiment with your data and your models, the better you will understand how these methods can help you answer new kinds of questions—and, the more prepared you will be to learn even more advanced applications of word vector models! 
 
 ## Next steps
 
